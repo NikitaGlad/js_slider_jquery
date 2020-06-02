@@ -1,16 +1,16 @@
 
 
-var carousel = $(".carousel")
-var slides = $(".slide");
-var indicators = $(".indicator");
-var btnPlayPause = $("#pause");
-var btnNext = $("#next");
-var btnPrev = $("#prev");
-var indicatorContainer = $(".indicators");
+var carousel = $('.carousel')
+var slides = $('.slide');
+var indicators = $('.indicator');
+var btnPlayPause = $('#pause');
+var btnNext = $('#next');
+var btnPrev = $('#prev');
+var indicatorContainer = $('.indicators');
 
-var left = "ArrowLeft"
-var right = "ArrowRight";
-var space = " ";
+var left = 'ArrowLeft';
+var right = 'ArrowRight';
+var space = ' ';
 
 var slideInterval = setInterval(roll, 2000);
 var currentSlide = 0;
@@ -23,14 +23,14 @@ var swipeEndX = null;
 
 
 function roll (n){
-    if(n === undefined){
+   if(n === undefined){
         n = currentSlide + 1;
-    }
-    slides.eq(currentSlide).toggleClass("active");
-    indicators.eq(currentSlide).toggleClass("active");
+    } 
+    slides.eq(currentSlide).toggleClass('active');
+    indicators.eq(currentSlide).toggleClass('active');
     currentSlide = (n + slides.length) % slides.length;
-    slides.eq(currentSlide).toggleClass("active");
-    indicators.eq(currentSlide).toggleClass("active");
+    slides.eq(currentSlide).toggleClass('active');
+    indicators.eq(currentSlide).toggleClass('active');
 }
 
 
@@ -45,7 +45,6 @@ function prev(){
 
 
 function playPause(){
-    console.log(isplaying)
     if(isplaying){
         pause();
     }else{
@@ -54,14 +53,14 @@ function playPause(){
 }
 
 function pause(){
-    btnPlayPause.html("Play");
+    btnPlayPause.html('Play');
     clearInterval(slideInterval);
     isplaying = false;
     
 }
 
 function play (){
-    btnPlayPause.html("Pause");
+    btnPlayPause.html('Pause');
     slideInterval = setInterval(roll, 2000);
     isplaying = true;
 }
@@ -78,9 +77,9 @@ function clickPrev(){
 function indicatorTo(e) {
     var target = $(e.target);
     
-    if(target.hasClass("indicator")){
+    if(target.hasClass('indicator')){
         pause();
-        roll(+target.attr("data-slide-to"));
+        roll(+target.attr('data-slide-to'));
     }
     target.blur()
 
@@ -104,21 +103,25 @@ function swipeEnd(e){
 }
 
 
-btnPlayPause.click((e) => {
-    playPause()
-    btnPlayPause.blur()
-});
-btnNext.click(() => {
-    clickNext()
-    btnNext.blur()
-});
-btnPrev.click(() => {
-    clickPrev()
-    btnPrev.blur()
-});
-indicatorContainer.click((e) => {
-    indicatorTo(e)
-});
-$(document).keydown(pressKey);
-carousel.on("touchstart", swipeStart);
-carousel.on("touchend", swipeEnd);
+// btnPlayPause.click((e) => {
+//     playPause()
+//     btnPlayPause.blur()
+// });
+// btnNext.click(() => {
+//     clickNext()
+//     btnNext.blur()
+// });
+// btnPrev.click(() => {
+//     clickPrev()
+//     btnPrev.blur()
+// });
+// indicatorContainer.click((e) => {
+//     indicatorTo(e)
+// });
+btnPlayPause.on('click', playPause);
+btnNext.on('click', clickNext);
+btnPrev.on('click', clickPrev);
+indicatorContainer.on('click', indicatorTo)
+$(document).on('keydown', pressKey);
+carousel.on('touchstart', swipeStart);
+carousel.on('touchend', swipeEnd);
