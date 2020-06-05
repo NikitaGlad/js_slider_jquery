@@ -1,127 +1,70 @@
+let $slides = $('.slides__item');
+let $indContainer = $('.indicators');
+let $indItems = $('.indicators__item');
+let currentSlide = 0;
+let carouselInterval = 2000;
+const SPACE = ' ';
+const LEFT_ONE = 'ArrowLeft';
+const RIGHT_ONE = 'ArrowRight';
+const PAUSE_FA = '<i class="fas fa-pause"></i>';
+const PLAY_FA = '<i class="fas fa-play"></i>';
+$indContainer.css('display', 'flex');
+$('.controls').css('display', 'block'); 
 
+let gotoNSlide = (n) => {
+    $($slides[currentSlide]).toggleClass('active');
+    $($indItems[currentSlide]).toggleClass('active');
+    currentSlide = (n + $slides.length) % $slides.length;
+    $($slides[currentSlide]).toggleClass('active');
+    $($indItems[currentSlide]).toggleClass('active');
+};
+let gotoNextSlide = () => gotoNSlide(currentSlide + 1);
+let gotoPrevSlide = () => gotoNSlide(currentSlide - 1);
 
-var carousel = $('.carousel')
-var slides = $('.slide');
-var indicators = $('.indicator');
-var btnPlayPause = $('#pause');
-var btnNext = $('#next');
-var btnPrev = $('#prev');
-var indicatorContainer = $('.indicators');
+let playbackStatus = true;
+let $pausePlayBtn = $('.indicators__pause');
+let $nextBtn = $('.controls__next');
+let $prevBtn = $('.controls__prev');
+let slideInterval = setInterval(gotoNextSlide, carouselInterval);
 
-var left = 'ArrowLeft';
-var right = 'ArrowRight';
-var space = ' ';
-
-var slideInterval = setInterval(roll, 2000);
-var currentSlide = 0;
-var isplaying = true;
-var swipeStartX = null;
-var swipeEndX = null;
-
-
-
-
-
-function roll (n){
-   if(n === undefined){
-        n = currentSlide + 1;
-    } 
-    slides.eq(currentSlide).toggleClass('active');
-    indicators.eq(currentSlide).toggleClass('active');
-    currentSlide = (n + slides.length) % slides.length;
-    slides.eq(currentSlide).toggleClass('active');
-    indicators.eq(currentSlide).toggleClass('active');
-}
-
-
-
-function next(){
-    roll(currentSlide + 1);
-}
-function prev(){
-    roll(currentSlide - 1);
-}
-
-
-
-function playPause(){
-    if(isplaying){
-        pause();
-    }else{
-        play();
+let pauseSlideShow = () => {
+    if (playbackStatus) {
+        $pausePlayBtn.html(PAUSE_FA);
+        playbackStatus = !playbackStatus;
+        clearInterval(slideInterval);
     }
-}
+};
 
-function pause(){
-    btnPlayPause.html('Play');
-    clearInterval(slideInterval);
-    isplaying = false;
-    
-}
+let playSlideShow = () => {
+    $pausePlayBtn.html(PLAY_FA);
+    playbackStatus = !playbackStatus;
+    slideInterval = setInterval(gotoNextSlide, carouselInterval);
+};
+let clickPausePlayBtn = () => playbackStatus ? pauseSlideShow() : playSlideShow();
 
-function play (){
-    btnPlayPause.html('Pause');
-    slideInterval = setInterval(roll, 2000);
-    isplaying = true;
-}
+let clickNextBtn = () => {
+    pauseSlideShow();
+    gotoNextSlide();
+};
+let clickPrevBtn = () => {
+    pauseSlideShow();
+    gotoPrevSlide();
+};
+$pausePlayBtn.on('click', clickPausePlayBtn);
+$nextBtn.on('click', clickNextBtn);
+$prevBtn.on('click', clickPrevBtn);
 
-function clickNext(){
-    pause();
-    next();
-}
-function clickPrev(){
-    pause();
-    prev();
-}
+let clickIndicatorBtn = (e) => {
+    pauseSlideShow();
+    gotoNSlide(+e.target.getAttribute('data-slide-to'));
+};
 
-function indicatorTo(e) {
-    var target = $(e.target);
-    
-    if(target.hasClass('indicator')){
-        pause();
-        roll(+target.attr('data-slide-to'));
-    }
-    target.blur()
+$indContainer.on('click', '.indicators__item', clickIndicatorBtn);
 
-}
+let pressKeyControl = (e) => {
+    if (e.key === LEFT_ONE) clickPrevBtn();
+    if (e.key === RIGHT_ONE) clickNextBtn();
+    if (e.key === SPACE) clickPausePlayBtn();
+};
 
-function pressKey(e){
-    if(e.key === right) clickNext();
-    if(e.key === left) clickPrev();
-    if(e.key === space) playPause();
-}
-
-function swipeStart(e){
-  
-    swipeStartX = e.changedTouches[0].pageX;
-}
-
-function swipeEnd(e){
-    swipeEndX = e.changedTouches[0].pageX;
-    if (swipeStartX - swipeEndX < -30) clickPrev();
-    if (swipeStartX - swipeEndX > 30) clickNext();
-}
-
-
-// btnPlayPause.click((e) => {
-//     playPause()
-//     btnPlayPause.blur()
-// });
-// btnNext.click(() => {
-//     clickNext()
-//     btnNext.blur()
-// });
-// btnPrev.click(() => {
-//     clickPrev()
-//     btnPrev.blur()
-// });
-// indicatorContainer.click((e) => {
-//     indicatorTo(e)
-// });
-btnPlayPause.on('click', playPause);
-btnNext.on('click', clickNext);
-btnPrev.on('click', clickPrev);
-indicatorContainer.on('click', indicatorTo)
-$(document).on('keydown', pressKey);
-carousel.on('touchstart', swipeStart);
-carousel.on('touchend', swipeEnd);
+$(document).on('keydown', pressKeyControl);
